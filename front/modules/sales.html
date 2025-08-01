@@ -1222,6 +1222,7 @@
                             const unitPriceInput = div.querySelector('input[name="unitPrice"]');
                             unitPriceInput.value = produto.price.toFixed(2);
                         } catch (err) {
+							console.log(err)
                             alert("Erro ao carregar produto: " + err.message);
                         }
                     }
@@ -1375,20 +1376,23 @@
                 productSelect.addEventListener('change', async (e) => {
                     const selectedProductId = e.target.value;
                     if (selectedProductId) {
-                        try {
-                            const response = await fetch(`${window.apiUrl}/api/products/${selectedProductId}`, {
-                                credentials: 'include'
-                            });
+						try {
+							const res = await fetch(`${window.apiUrl}/api/products/${selectedProductId}`, {
+								credentials: 'include'
+							});
 
-                            if (!response.ok) throw new Error('Erro ao carregar produto');
+							if (!res.ok) throw new Error('Erro ao carregar produto');
 
-                            const produto = await response.json();
-                            const unitPriceInput = div.querySelector('input[name="unitPrice"]');
-                            unitPriceInput.value = produto.price.toFixed(2); // Preenche o preço automaticamente
-                        } catch (err) {
-                            alert("Erro ao carregar produto: " + err.message);
-                        }
-                    }
+							const json = await res.json();
+							const produto = json.body;
+							console.log(produto);
+
+							const unitPriceInput = div.querySelector('input[name="unitPrice"]');
+							unitPriceInput.value = Number(produto.price).toFixed(2); // Preenche o preço automaticamente
+						} catch (err) {
+							console.error(err);
+							alert("Erro ao carregar produto: " + err.message);
+						}                    }
                 });
             } else {
                 console.error('Não foi possível encontrar o select de produtos');
