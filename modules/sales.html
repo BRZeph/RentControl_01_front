@@ -1,0 +1,1470 @@
+<style>
+    .sales-module { padding: 1.5rem; }
+
+    .sales-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .sales-header h2 {
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+
+    .new-order-btn {
+        background-color: #2563eb;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .sales-card {
+        background-color: white;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .sales-toolbar {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+    }
+
+    .sales-filters {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .filter-btn {
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        color: #6b7280;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+    }
+
+    .filter-btn.active,
+    .filter-btn:hover {
+        color: #2563eb;
+        border-bottom: 2px solid #2563eb;
+    }
+
+    .sales-search {
+        position: relative;
+    }
+
+    .sales-search input {
+        padding: 0.5rem 1rem 0.5rem 2.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        width: 200px;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 0.6rem;
+        color: #9ca3af;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .sales-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+    }
+
+    .sales-table thead {
+        background-color: #f9fafb;
+    }
+
+    .sales-table th,
+    .sales-table td {
+        padding: 0.75rem;
+        text-align: left;
+    }
+
+    .sales-footer {
+        display: flex;
+        flex-wrap: wrap; /* quebra em telas menores */
+        gap: 1rem; /* espaçamento entre elementos */
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    .pagination-info,
+    .pagination-buttons,
+    .pagination-controls {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .pagination-buttons button {
+        padding: 0.25rem 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        background-color: white;
+        color: #374151;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        font-weight: 500;
+        min-width: 2rem; /* evita encolhimento */
+        height: 2rem;
+    }
+
+    .pagination-buttons button.active {
+        background-color: #2563eb;
+        color: white;
+        font-weight: 500; /* igual ao normal */
+        border: 1px solid #2563eb; /* mantém borda coerente */
+    }
+
+    .sales-analytics {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+        .sales-analytics {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .analytics-card {
+        background-color: white;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .analytics-card h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .chart-container {
+        height: 300px;
+    }
+
+    .top-customers {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .customer-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .customer-row .initial {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 9999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+
+    .customer-row.blue .initial { background-color: #dbeafe; color: #2563eb; }
+    .customer-row.green .initial { background-color: #d1fae5; color: #10b981; }
+    .customer-row.purple .initial { background-color: #ede9fe; color: #8b5cf6; }
+
+    .customer-row .info h4 {
+        font-weight: 500;
+    }
+
+    .customer-row .info p {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    .growth {
+        font-weight: 500;
+        color: #10b981;
+    }
+
+    .growth.negative {
+        color: #ef4444;
+    }
+</style>
+
+<div class="module-content sales-module">
+    <div class="sales-header">
+        <h2>Controle de vendas</h2>
+        <button class="new-order-btn">
+            <i class="fas fa-plus mr-2"></i> Lançar pedido
+        </button>
+    </div>
+
+    <div class="sales-card">
+        <div class="sales-toolbar">
+            <div class="sales-filters">
+<!--                    campo dinâmico-->
+            </div>
+            <div class="sales-search">
+                <input type="text" placeholder="Buscar pedidos..." />
+                <i class="fas fa-search search-icon"></i>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="sales-table">
+                <thead>
+                <tr>
+<!--                    campo dinâmico-->
+                </tr>
+                </thead>
+                <tbody id="salesTableBody"></tbody>
+            </table>
+        </div>
+
+        <div class="sales-footer">
+            <div class="pagination-info">
+                Mostrando <span id="salesStart"></span>a<span id="salesEnd"></span>de<span id="salesTotal"></span>entradas
+            </div>
+            <div class="pagination-buttons">
+                <button>Anterior</button>
+                <button class="active">1</button>
+                <button>2</button>
+                <button>3</button>
+                <button>Próximo</button>
+            </div>
+            <div class="pagination-controls flex items-center space-x-2">
+                <label for="itemsPerPage">Mostrar</label>
+                <select id="itemsPerPage" class="border rounded px-2 py-1 text-sm">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="25">25</option>
+                </select>
+                <span>Entradas</span>
+            </div>
+        </div>
+    </div>
+    <div class="sales-analytics">
+        <div class="analytics-card">
+            <h3>Estatísticas de venda</h3>
+            <div class="chart-container">
+                <canvas id="salesStatsChart"></canvas>
+            </div>
+        </div>
+        <div class="analytics-card">
+            <h3>Top clientes</h3>
+            <div class="top-customers">
+            </div>
+        </div>
+    </div>
+    <!-- Modal de Visualização da Ordem -->
+    <div id="orderModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 w-full max-w-2xl shadow-lg max-h-[90vh] overflow-y-auto relative">
+            <!-- Cabeçalho fixo -->
+            <div class="sticky top-0 bg-white z-10 pb-2 border-b mb-4">
+                <div class="flex justify-between items-center">
+                    <h2 id="modalOrderId" class="text-lg font-bold">Order #</h2>
+                    <button id="modalCloseBtn" class="text-gray-500 hover:text-gray-800 text-xl font-bold">&times;</button>
+                </div>
+            </div>
+
+            <!-- Conteúdo rolável -->
+            <div class="space-y-4">
+                <div id="orderModalContent" class="space-y-2">
+                    <!-- Conteúdo da ordem será injetado aqui -->
+                </div>
+
+                <div id="paymentSection" class="pt-4 border-t mt-4 space-y-2">
+                    <h3 class="text-md font-semibold">Pagamentos</h3>
+                    <div id="paymentList">
+                        <!-- Itens de pagamento serão inseridos aqui -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal de Edição da Ordem -->
+    <div id="editOrderModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold">Edit Order</h2>
+                <button id="editModalCloseBtn" class="text-gray-500 hover:text-gray-800">&times;</button>
+            </div>
+            <form id="editOrderForm" class="space-y-4">
+                <input type="hidden" id="editOrderId" />
+
+                <div>
+                    <label for="editStatus" class="block text-sm font-medium text-gray-700">Status</label>
+                    <select id="editStatus" class="mt-1 block w-full border rounded px-3 py-2">
+                        <!-- preenchido dinamicamente -->
+                    </select>
+                </div>
+                <div>
+                    <label for="editEntregaFactual" class="block text-sm font-medium text-gray-700">Entrega real</label>
+                    <input type="date" id="editEntregaFactual" class="mt-1 block w-full border rounded px-3 py-2" />
+                </div>
+                <div>
+                    <label for="editDevolucaoReal" class="block text-sm font-medium text-gray-700">Devolução Real</label>
+                    <input type="date" id="editDevolucaoReal" class="mt-1 block w-full border rounded px-3 py-2" />
+                </div>
+                <div>
+                    <label for="editDescricao" class="block text-sm font-medium text-gray-700">Descrição</label>
+                    <textarea id="editDescricao" rows="3" class="mt-1 block w-full border rounded px-3 py-2" placeholder="Digite a descrição..."></textarea>
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" id="saveEditBtn" class="bg-blue-600 text-white px-4 py-2 rounded">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Modal de Processamento da Ordem -->
+    <div id="processModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold">Processar Ordem</h2>
+                <button id="processModalCloseBtn" class="text-gray-500 hover:text-gray-800 text-xl font-bold">&times;</button>
+            </div>
+            <p class="mb-4 text-sm text-gray-600">Escolha o que deseja fazer com a ordem:</p>
+            <div class="flex flex-col space-y-3">
+                <button id="processEditItensBtn" class="bg-blue-600 text-white px-4 py-2 rounded">Modificar Ordem</button>
+                <button id="processAddPaymentBtn" class="bg-green-600 text-white px-4 py-2 rounded">Adicionar Pagamento</button>
+                <button id="processTrocaBtn" class="bg-purple-600 text-white px-4 py-2 rounded">Lançar Troca</button>
+            </div>
+        </div>
+    </div>
+    <!-- Modal de Troca -->
+    <div id="createTrocaModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-2xl shadow-lg max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold">Troca de Produto</h2>
+                <button id="createTrocaCloseBtn" class="text-gray-500 hover:text-gray-800 text-xl font-bold">&times;</button>
+            </div>
+            <form id="createTrocaForm" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="trocaCustomerId" class="block text-sm font-medium mb-1">Cliente</label>
+                        <input type="text" name="customerId" id="trocaCustomerId" class="w-full border px-3 py-2 rounded bg-gray-100" readonly />
+                    </div>
+                    <div>
+                        <label>Entrega Prevista</label>
+                        <input type="date" name="entregaPrevista" class="w-full border px-3 py-2 rounded" required />
+                    </div>
+                    <div>
+                        <label>Devolução Prevista</label>
+                        <input type="date" name="devolucaoPrevista" class="w-full border px-3 py-2 rounded" required />
+                    </div>
+                </div>
+
+                <h3 class="font-bold mt-4">Itens da Troca</h3>
+                <div id="trocaItemsContainer" class="space-y-4"></div>
+                <button type="button" id="addTrocaItemBtn" class="bg-green-600 text-white px-3 py-1 rounded">Adicionar Item</button>
+
+                <div class="flex justify-end">
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Salvar Troca</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Modal de Adicionar Pagamento -->
+    <div id="addPaymentModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold">Adicionar Pagamento</h2>
+                <button id="addPaymentModalCloseBtn" class="text-gray-500 hover:text-gray-800 text-xl font-bold">&times;</button>
+            </div>
+            <form id="addPaymentForm" class="space-y-4">
+                <input type="hidden" id="paymentOrderId" />
+                <div>
+                    <label for="paymentAmount" class="block text-sm font-medium text-gray-700">Valor Pago</label>
+                    <input type="number" step="0.01" id="paymentAmount" required class="mt-1 block w-full border rounded px-3 py-2" />
+                </div>
+                <div>
+                    <label for="paymentMethod" class="block text-sm font-medium text-gray-700">Método</label>
+                    <select id="paymentMethod" required class="mt-1 block w-full border rounded px-3 py-2">
+                        <option value="CREDIT_CARD">Cartão de Crédito</option>
+                        <option value="PIX">PIX</option>
+                        <option value="BOLETO">Boleto</option>
+                        <option value="DINHEIRO">Dinheiro</option>
+                    </select>
+                </div>
+                <div class="flex justify-end">
+                    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Criação de Ordem -->
+    <div id="createOrderModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-2xl shadow-lg max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold">Nova Ordem</h2>
+                <button id="createOrderCloseBtn" class="text-gray-500 hover:text-gray-800 text-xl font-bold">&times;</button>
+            </div>
+            <form id="createOrderForm" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="customerId" class="block text-sm font-medium mb-1">Cliente</label>
+                        <select name="customerId" id="customerId" required class="w-full border px-3 py-2 rounded shadow-sm">
+                            <option value="">Selecione um cliente</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Entrega Prevista</label>
+                        <input type="date" name="entregaPrevista" class="w-full border px-3 py-2 rounded" />
+                    </div>
+                    <div>
+                        <label>Devolução Prevista</label>
+                        <input type="date" name="devolucaoPrevista" class="w-full border px-3 py-2 rounded" />
+                    </div>
+                </div>
+
+                <h3 class="font-bold mt-4">Itens</h3>
+                <div id="itemsContainer" class="space-y-4"></div>
+                <button type="button" id="addItemBtn" class="bg-green-600 text-white px-3 py-1 rounded">Adicionar Item</button>
+
+                <div class="flex justify-end">
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+
+    window.currentPage = 1;
+    window.itemsPerPage = 10;
+    window.salesStatsChart = null;
+    window.salesData = null;
+    window.clientes = null;
+
+    function init(){
+        window.apiUrl = "https://rentcontrol-01.onrender.com";
+        loadSalesStatusFilters();
+        loadSalesData();
+        loadClientsData();
+        loadPagination();
+        loadTopCustomers();
+        initButtons();
+        console.log("Init do módulo Sales executado.");
+    }
+
+    function generateStatusColorMap(orders) {
+        const uniqueStatuses = [...new Set(orders.map(o => o.status))];
+        const statusColors = ['green', 'blue', 'yellow', 'red', 'gray', 'purple', 'orange', 'indigo', 'pink'];
+        const map = {};
+        uniqueStatuses.forEach((status, i) => {
+            map[status] = `bg-${statusColors[i % statusColors.length]}-100 text-${statusColors[i % statusColors.length]}-800`;
+        });
+        return map;
+    }
+
+    function loadPagination() {
+        document.getElementById('itemsPerPage').addEventListener('change', (e) => {
+            itemsPerPage = parseInt(e.target.value);
+            currentPage = 1;
+
+            const activeBtn = document.querySelector('.sales-filters .filter-btn.active');
+            const selectedStatus = activeBtn ? activeBtn.dataset.status : 'all';
+
+            let filteredOrders;
+            if (selectedStatus === 'all') {
+                filteredOrders = window.salesData.orders;
+            } else {
+                filteredOrders = window.salesData.orders.filter(o => o.status === selectedStatus);
+            }
+
+            populateSalesTable(filteredOrders);
+        });
+    }
+
+    async function loadClientsData() {
+        try {
+            const response = await fetch(`${window.apiUrl}/api/users/clients`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) throw new Error('Erro ao carregar clientes');
+
+            const json = await response.json();
+            window.clientes = json.body;
+
+        } catch (err) {
+            alert("Erro ao buscar clientes: " + err.message);
+            window.clientes = []; // fallback seguro
+        }
+    }
+
+    async function loadSalesStatusFilters() {
+        try {
+            const response = await fetch(`${window.apiUrl}/api/orders/status`, {
+                method: 'GET',
+                credentials: 'include', // ou 'same-origin', dependendo do auth
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            const rawData = await response.json();
+
+            // transforma body: [{ id, name }, ...] => body: ["DELIVERED", "CRIADO", ...]
+            const data = {
+                body: rawData.body.map(statusObj => statusObj.name),
+                httpStatus: rawData.httpstatus
+            };
+            const statusList = data.body;
+
+            const filtersContainer = document.querySelector('.sales-filters');
+            filtersContainer.innerHTML = ''; // limpa filtros existentes
+
+            // Cria o botão "All Orders"
+            const allBtn = document.createElement('button');
+            allBtn.className = 'filter-btn active';
+            allBtn.textContent = 'Todos';
+            allBtn.dataset.status = 'all';
+            filtersContainer.appendChild(allBtn);
+
+            window.statusLabels = {
+                criado: "Criado",
+                aguardando_pagamento: "Aguardando Pagamento",
+                entregue: "Entregue",
+                em_uso: "Em uso",
+                cancelado: "Cancelado",
+                retornado: "Retornado",
+                trocado: "Trocado"
+            };
+
+            // Cria os demais botões com base no retorno da API
+            statusList.forEach(status => {
+                const btn = document.createElement('button');
+                btn.className = 'filter-btn';
+                btn.textContent = statusLabels[status.toLowerCase()] || capitalize(status);
+                btn.dataset.status = status.toLowerCase();
+                filtersContainer.appendChild(btn);
+            });
+
+            // Adiciona eventos aos botões
+            filtersContainer.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Atualiza destaque visual
+                    filtersContainer.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    currentPage = 1; // Voltar para a primeira página ao trocar de filtro
+
+                    // Aplica filtro na tabela
+                    const selectedStatus = btn.dataset.status;
+                    if (selectedStatus === 'all') {
+                        populateSalesTable(window.salesData.orders);
+                    } else {
+                        const filtered = window.salesData.orders.filter(o => o.status === selectedStatus);
+                        populateSalesTable(filtered);
+                    }
+                });
+            });
+
+            const statusSelect = document.getElementById('editStatus');
+            statusSelect.innerHTML = ''; // limpa antes de preencher
+
+            statusList.forEach(status => {
+                const opt = document.createElement('option');
+                opt.value = status.toLowerCase();
+                opt.textContent = capitalize(status);
+                statusSelect.appendChild(opt);
+            });
+
+        } catch (error) {
+            console.error("Erro ao carregar filtros de status:", error);
+        }
+    }
+
+    function capitalize(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    }
+
+    async function loadSalesData() {
+        try {
+            const response = await fetch(`${window.apiUrl}/api/orders/ov1`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            const data = await response.json();
+
+            window.salesData = {
+                orders: data.body.map(order => {
+                    const mapped = {};
+                    for (const [key, value] of Object.entries(order)) {
+                        if (key === 'orderId') {
+                            mapped.id = value;
+                        } else if (key === 'status') {
+                            mapped.status = value.toLowerCase();
+                        } else if (typeof value === 'number') {
+                            const isDecimal = !Number.isInteger(value);
+                            mapped[key] = isDecimal ? value.toFixed(2) : value;
+                        } else {
+                            mapped[key] = value;
+                        }
+                    }
+                    return mapped;
+                }),
+                stats: {
+                    totalOrders: data.body.length
+                }
+            };
+            window.statusMap = generateStatusColorMap(window.salesData.orders);
+            renderDynamicTableHeaders();
+            populateSalesTable(window.salesData.orders);
+            renderSalesStatistics(window.salesData);
+        } catch (error) {
+            console.error('Erro ao carregar dados de vendas:', error);
+        }
+    }
+
+
+    async function loadProductsData(select) {
+        try {
+            const response = await fetch(`${window.apiUrl}/api/products`, {
+                credentials: 'include'
+            });
+
+            if (!response.ok) throw new Error('Erro ao carregar produtos');
+
+            const json = await response.json();
+            const produtos = json.body;
+
+            // Verifica se o select é válido antes de tentar manipular seus filhos
+            if (!select) {
+                console.error("Select de produtos não encontrado.");
+                return;
+            }
+
+            // Limpa todas as opções existentes
+            while (select.firstChild) {
+                select.removeChild(select.firstChild);
+            }
+
+            // Adiciona opção padrão
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Selecione um produto';
+            select.appendChild(defaultOption);
+
+            // Preenche o select com os produtos
+            produtos.forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.id;
+                option.textContent = `${p.name} – R$ ${Number(p.price).toFixed(2)}`;
+                select.appendChild(option);
+            });
+        } catch (err) {
+            console.log(err)
+            alert("Erro ao carregar produtos: " + err.message);
+        }
+    }
+
+    function renderDynamicTableHeaders() {
+        const thead = document.querySelector('.sales-table thead tr');
+        thead.innerHTML = '';
+
+        if (!window.salesData || !window.salesData.orders || window.salesData.orders.length === 0) return;
+
+        const firstOrder = window.salesData.orders[0];
+        const ignoredKeys = ['id', 'status', 'payments', 'customerId', 'createdBy', 'orderType', 'orderItems'];
+
+        // Cria colunas fixas
+        thead.innerHTML += `<th>ID</th>`;
+        thead.innerHTML += `<th>Status</th>`;
+
+        // Salva as chaves dinâmicas em uma lista global
+        window.dynamicFields = Object.keys(firstOrder).filter(key => !ignoredKeys.includes(key));
+
+        const fieldLabels = {
+            orderDate: 'Data do Pedido',
+            entregaPrevista: 'Entrega Prevista',
+            devolucaoPrevista: 'Devolução Prevista',
+            devolucaoReal: 'Devolução Real',
+            entregaFactual: 'Entrega Real',
+            totalAmount: 'Valor Total',
+            totalPaid: 'Total Pago',
+            descricao: 'Descrição',
+            paid: 'Pago'
+        };
+
+        // Gera os headers com base nessas chaves
+        window.dynamicFields.forEach(key => {
+            const label = fieldLabels[key] || key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+            thead.innerHTML += `<th>${label}</th>`;
+        });
+
+        thead.innerHTML += '<th>Ações</th>';
+    }
+
+    function populateSalesTable(orders) {
+        const tableBody = document.getElementById('salesTableBody');
+        tableBody.innerHTML = '';
+
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const paginatedOrders = orders.slice(startIndex, startIndex + itemsPerPage);
+        const statusMap = window.statusMap;
+
+        paginatedOrders.forEach(order => {
+            const row = document.createElement('tr');
+            const statusClass = statusMap[order.status] || 'bg-gray-100 text-gray-800';
+
+            let rowHTML = `
+                            <td class="px-6 py-4 text-sm font-medium text-blue-600">${order.id}</td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 inline-flex text-xs font-semibold rounded-full ${statusClass}">
+                                    ${window.statusLabels[order.status?.toLowerCase()] || capitalize(order.status)}
+                                </span>
+                            </td>
+                            `;
+
+            let itensData = null;
+
+            // Gera colunas baseado em window.dynamicFields
+            window.dynamicFields.forEach(key => {
+                const value = order[key];
+
+                if (key === 'itens' && Array.isArray(value)) {
+                    itensData = value;
+                    rowHTML += `<td class="px-6 py-4 text-sm text-gray-700">[${value.length} itens]</td>`;
+                } else if (!Array.isArray(value)) {
+                    if(value !== null && value !== 0){
+                        rowHTML += `<td class="px-6 py-4 text-sm text-gray-700">${formatValue(value)}</td>`;
+                    } else {
+                        rowHTML += `<td class="px-6 py-4 text-sm text-gray-700">${'---'}</td>`;
+                    }
+                } else {
+                    rowHTML += `<td class="px-6 py-4 text-sm text-gray-700">-</td>`;
+                }
+            });
+
+            rowHTML += `
+                        <td class="px-6 py-4 text-sm">
+                            <button class="text-blue-600 hover:text-blue-900 mr-3" onclick="viewOrder('${order.id}')">Visualizar</button>
+                            <button class="text-yellow-600 hover:text-yellow-800 mr-3" onclick="processOrder('${order.id}')">Processar</button>
+                        </td>`;
+
+            row.innerHTML = rowHTML;
+            tableBody.appendChild(row);
+        });
+
+        const total = orders.length;
+        const end = Math.min(startIndex + itemsPerPage, total);
+        document.getElementById('salesStart').textContent = startIndex + 1;
+        document.getElementById('salesEnd').textContent = end;
+        document.getElementById('salesTotal').textContent = total;
+
+        renderPaginationControls(orders);
+    }
+
+    function renderPaymentsSection(payments, orderId) {
+        const container = document.getElementById('paymentSection');
+        container.innerHTML = ''; // limpa conteúdo anterior
+
+        const title = document.createElement('h3');
+        title.className = 'text-md font-semibold mb-2';
+        title.textContent = `Pagamentos da Ordem #${orderId}`;
+        container.appendChild(title);
+
+        if (!payments || payments.length === 0) {
+            const emptyMsg = document.createElement('p');
+            emptyMsg.className = 'text-gray-600';
+            emptyMsg.textContent = 'Nenhum pagamento registrado.';
+            container.appendChild(emptyMsg);
+        } else {
+            payments.forEach((payment, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'border p-3 rounded shadow-sm bg-gray-50 mb-2';
+
+                let inner = `<h4 class="font-semibold text-indigo-600 mb-2">Pagamento ${index + 1}</h4>`;
+                inner += '<ul class="list-disc pl-5 text-sm space-y-1">';
+
+                for (const [key, value] of Object.entries(payment)) {
+                    const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase());
+                    inner += `<li><strong>${label}:</strong> ${formatValue(value)}</li>`;
+                }
+
+                inner += '</ul>';
+                wrapper.innerHTML = inner;
+                container.appendChild(wrapper);
+            });
+        }
+    }
+
+    function processOrder(orderId) {
+        window.idTrocaOrdem = orderId;
+        const modal = document.getElementById('processModal');
+        modal.classList.remove('hidden');
+
+        document.getElementById('processEditItensBtn').onclick = () => {
+            modal.classList.add('hidden');
+            editOrder(orderId); // mesma função usada antes
+        };
+
+        document.getElementById('processAddPaymentBtn').onclick = () => {
+            modal.classList.add('hidden');
+            openAddPaymentModal(orderId); // função que abre o modal de pagamento
+        };
+
+        document.getElementById('processModalCloseBtn').onclick = () => {
+            modal.classList.add('hidden');
+        };
+    }
+
+    function openAddPaymentModal(orderId) {
+        const modal = document.getElementById('addPaymentModal');
+        document.getElementById('paymentOrderId').value = orderId;
+        modal.classList.remove('hidden');
+
+        document.getElementById('addPaymentForm').onsubmit = async (e) => {
+            e.preventDefault();
+
+            const method = document.getElementById('paymentMethod').value;
+            const amount = document.getElementById('paymentAmount').value;
+
+            const payload = {
+                paymentDate: new Date().toISOString(),
+                method: method,
+                amountPaid: parseFloat(amount)
+            };
+
+            try {
+                const response = await fetch(`${window.apiUrl}/orders/${orderId}/payments`, {
+                    method: 'POST',
+                    credentials: 'include', // ou 'same-origin', dependendo do auth
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const responseBody = await response.json();
+
+                if (!response.ok) {
+                    alert("Erro ao adicionar pagamento: " + responseBody.message);
+                } else {
+                    alert('Pagamento adicionado com sucesso');
+                    modal.classList.add('hidden');
+                    await loadSalesData();
+                }
+            } catch (error) {
+                console.error(error);
+                alert(`Erro ao conectar com o banco`);
+            }
+        };
+
+        document.getElementById('addPaymentCloseBtn').onclick = () => {
+            modal.classList.add('hidden');
+        };
+    }
+
+    function formatValue(value) {
+        if (value === true || value === "true") {
+            return "Sim";
+        } else if (value === false || value === "false") {
+            return "Não";
+        }
+        return value ?? '';
+    }
+
+
+    function renderPaginationControls(orders) {
+        const totalPages = Math.ceil(orders.length / itemsPerPage);
+        const container = document.querySelector('.pagination-buttons');
+        container.innerHTML = '';
+
+        // Botão "Previous"
+        const prevBtn = document.createElement('button');
+        prevBtn.textContent = 'Anterior';
+        prevBtn.disabled = currentPage === 1;
+        prevBtn.onclick = () => {
+            if (currentPage > 1) {
+                currentPage--;
+                populateSalesTable(orders);
+            }
+        };
+        container.appendChild(prevBtn);
+
+        // Parâmetros de intervalo dinâmico
+        const maxVisible = 5; // quantidade central de páginas visíveis
+        const visiblePages = [];
+
+        const showStartEllipsis = currentPage > 3;
+        const showEndEllipsis = currentPage < totalPages - 2;
+
+        // Sempre mostra a primeira página
+        visiblePages.push(1);
+
+        if (showStartEllipsis) visiblePages.push('...');
+
+        // Páginas centrais dinâmicas
+        const start = Math.max(2, currentPage - 2);
+        const end = Math.min(totalPages - 1, currentPage + 2);
+        for (let i = start; i <= end; i++) {
+            visiblePages.push(i);
+        }
+
+        if (showEndEllipsis) visiblePages.push('...');
+
+        // Sempre mostra a última página (se for diferente da primeira)
+        if (totalPages > 1) visiblePages.push(totalPages);
+
+        // Renderizar os botões
+        visiblePages.forEach(p => {
+            const btn = document.createElement('button');
+            btn.textContent = p;
+
+            if (p === '...') {
+                btn.disabled = true;
+                btn.classList.add('cursor-default', 'text-gray-400');
+            } else {
+                if (p === currentPage) {
+                    btn.classList.add('active');
+                }
+                btn.onclick = () => {
+                    currentPage = p;
+                    populateSalesTable(orders);
+                };
+            }
+
+            container.appendChild(btn);
+        });
+
+        // Botão "Next"
+        const nextBtn = document.createElement('button');
+        nextBtn.textContent = 'Próximo';
+        nextBtn.disabled = currentPage === totalPages;
+        nextBtn.onclick = () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                populateSalesTable(orders);
+            }
+        };
+        container.appendChild(nextBtn);
+    }
+
+
+    function renderSalesStatistics(data) {
+        const salesStatsCtx = document.getElementById('salesStatsChart').getContext('2d');
+
+        if (window.salesStatsChart) {
+            window.salesStatsChart.destroy();
+        }
+
+        // Agrupa por status e conta as ocorrências
+        const statusCounts = {};
+        data.orders.forEach(order => {
+            const status = order.status;
+            statusCounts[status] = (statusCounts[status] || 0) + 1;
+        });
+
+        const labels = Object.keys(statusCounts).map(
+            s => window.statusLabels[s] || s
+        );
+        const values = Object.values(statusCounts);
+
+        // Gera cores automaticamente (padrão Tailwind-like)
+        const baseColors = [
+            [16, 185, 129],
+            [59, 130, 246],
+            [245, 158, 11],
+            [239, 68, 68],
+            [139, 92, 246],
+            [253, 224, 71],
+            [244, 63, 94],
+            [14, 165, 233],
+        ];
+
+        const backgroundColor = baseColors.slice(0, labels.length).map(
+            rgb => `rgba(${rgb.join(',')}, 0.8)`
+        );
+        const borderColor = baseColors.slice(0, labels.length).map(
+            rgb => `rgba(${rgb.join(',')}, 1)`
+        );
+
+        window.salesStatsChart = new Chart(salesStatsCtx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: backgroundColor,
+                    borderColor: borderColor,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    function viewOrder(orderId) {
+        if (!window.salesData || !window.salesData.orders) {
+            console.warn("salesData not loaded yet.");
+            return;
+        }
+
+        const order = window.salesData.orders.find(o => o.id == orderId);
+        if (!order) {
+            console.warn(`Order ${orderId} not found.`);
+            return;
+        }
+
+        const modal = document.getElementById('orderModal');
+        document.getElementById('modalOrderId').textContent = `Order #${order.id}`;
+
+        const modalContent = document.getElementById('orderModalContent');
+        modalContent.innerHTML = '';
+
+        Object.entries(order).forEach(([key, value]) => {
+            if (key === 'id' || Array.isArray(value)) return;
+
+            const label = key
+                .replace(/([A-Z])/g, ' $1')
+                .replace(/^./, str => str.toUpperCase());
+
+            const formattedValue = formatValue(value);
+
+            const p = document.createElement('p');
+            p.innerHTML = `<strong>${label}:</strong> <span class="text-gray-700">${formattedValue}</span>`;
+            modalContent.appendChild(p);
+        });
+
+        // aplica classe de status (se existir)
+        const statusElement = document.getElementById('modalStatus');
+        if (statusElement) {
+            statusElement.textContent = order.status.charAt(0).toUpperCase() + order.status.slice(1);
+            statusElement.className = 'font-medium ' + (window.statusMap[order.status] || 'text-gray-800');
+        }
+
+        document.getElementById('modalCloseBtn').onclick = () => {
+            modal.classList.add('hidden');
+        };
+
+        renderPaymentsSection(order.payments, order.id);
+
+        modal.classList.remove('hidden');
+    }
+
+    function editOrder(orderId) {
+        const order = window.salesData.orders.find(o => o.id == orderId);
+        if (!order) {
+            console.warn(`Order ${orderId} not found.`);
+            return;
+        }
+
+        // Preencher dados
+        document.getElementById('editOrderId').value = order.id;
+        document.getElementById('editStatus').value = order.status;
+        document.getElementById('editEntregaFactual').value = order.entregaFactual || '';
+        document.getElementById('editDevolucaoReal').value = order.devolucaoReal || '';
+
+        // Abrir modal
+        document.getElementById('editOrderModal').classList.remove('hidden');
+    }
+
+    async function loadTopCustomers() {
+        try {
+            const response = await fetch(`${window.apiUrl}/api/analytics/top-customers`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+            const customers = data.body || [];
+
+            const container = document.querySelector('.top-customers');
+            container.innerHTML = '';
+
+            const colors = ['blue', 'green', 'purple', 'orange', 'red'];
+
+            customers.forEach((customer, index) => {
+                const div = document.createElement('div');
+                div.className = `customer-row ${colors[index % colors.length]}`;
+
+                const initials = getInitials(customer.name);
+
+                div.innerHTML = `
+                <div class="initial">${initials}</div>
+                <div class="info">
+                    <h4>${customer.name}</h4>
+                    <p>$${Number(customer.totalSales).toLocaleString()} em total de vendas</p>
+                </div>
+            `;
+                // <span className="growth ${customer.growth < 0 ? 'negative' : ''}">${customer.growth}%</span>
+
+                container.appendChild(div);
+            });
+        } catch (error) {
+            console.error('Erro ao buscar top customers:', error);
+        }
+    }
+
+    function getInitials(name) {
+        if (!name) return '';
+        const parts = name.trim().split(' ');
+        return parts.length === 1
+            ? parts[0].slice(0, 2).toUpperCase()
+            : (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+
+    function initButtons(){
+        initBotaoEditarOrdem();
+        initBotaoCriarOrdem();
+        initBotaoTrocarOrdem();
+    }
+
+    async function initBotaoTrocarOrdem() {
+        window.idTrocaOrdem = null;
+        document.getElementById('processTrocaBtn').onclick = async () => {
+            await loadClientsData();
+            if (!window.idTrocaOrdem) {
+                alert("Ordem de referência não definida.");
+                return;
+            }
+
+            const order = window.salesData.orders.find(o => o.id == window.idTrocaOrdem);
+            if (!order) {
+                alert("Ordem de referência não encontrada.");
+                return;
+            }
+
+            // Preenche cliente
+            const cliente = window.clientes?.find(c => c.id == order.customerId);
+            const clienteInput = document.getElementById('trocaCustomerId');
+            if (cliente) {
+                clienteInput.value = `${cliente.name} – ${cliente.email} – ${cliente.phone}`;
+                clienteInput.dataset.id = cliente.id; // importante para o envio
+            }
+
+            if (cliente) {
+                clienteInput.value = `${cliente.name} – ${cliente.email} – ${cliente.phone}`;
+            } else {
+                clienteInput.value = `ID ${order.customerId} (cliente não encontrado)`;
+            }
+
+            // Preenche um item com o mesmo endereço da ordem anterior (do primeiro item)
+            const container = document.getElementById('trocaItemsContainer');
+            container.innerHTML = '';
+
+            const div = document.createElement('div');
+            div.className = "grid grid-cols-3 gap-2 border p-2 rounded bg-gray-100";
+            div.innerHTML = `
+                                <select name="productId" class="border px-2 py-1 rounded" required></select>
+                                <input type="number" name="quantity" placeholder="Quantidade" class="border px-2 py-1 rounded" required />
+                                <input type="number" name="unitPrice" placeholder="Preço Unitário" step="0.01" class="border px-2 py-1 rounded" required readonly />
+                                <input type="number" name="diasLocados" placeholder="Dias" class="border px-2 py-1 rounded" required />
+                                <input type="text" name="street" placeholder="Rua" class="border px-2 py-1 rounded" required />
+                                <input type="text" name="number" placeholder="Número" class="border px-2 py-1 rounded" required />
+                                <input type="text" name="city" placeholder="Cidade" class="border px-2 py-1 rounded" required />
+                                <input type="text" name="state" placeholder="Estado" class="border px-2 py-1 rounded" required />
+                                <input type="text" name="zipCode" placeholder="CEP" class="border px-2 py-1 rounded" required />
+                            `;
+
+            container.appendChild(div);
+
+            // Preenche endereço do primeiro item da ordem anterior
+            const refItem = order.orderItems?.[0];
+            div.querySelector('input[name="street"]').value = refItem.endereco.street;
+            div.querySelector('input[name="number"]').value = refItem.endereco.number;
+            div.querySelector('input[name="city"]').value = refItem.endereco.city;
+            div.querySelector('input[name="state"]').value = refItem.endereco.state;
+            div.querySelector('input[name="zipCode"]').value = refItem.endereco.zipCode;
+
+            // Carrega produtos
+            const productSelect = div.querySelector('select[name="productId"]');
+            if (productSelect) {
+                await loadProductsData(productSelect);
+                productSelect.addEventListener('change', async (e) => {
+                    const selectedProductId = e.target.value;
+                    if (selectedProductId) {
+                        try {
+                            const response = await fetch(`${window.apiUrl}/api/products/${selectedProductId}`, {
+                                method: 'GET',
+                                credentials: 'include'
+                            });
+                            if (!response.ok) throw new Error('Erro ao carregar produto');
+                            const produto = await response.json();
+                            const unitPriceInput = div.querySelector('input[name="unitPrice"]');
+                            unitPriceInput.value = produto.price.toFixed(2);
+                        } catch (err) {
+                            alert("Erro ao carregar produto: " + err.message);
+                        }
+                    }
+                });
+            }
+
+            document.getElementById('createTrocaForm').onsubmit = async (e) => {
+                e.preventDefault();
+
+                const entregaPrevista = document.querySelector('#createTrocaForm input[name="entregaPrevista"]').value;
+                const devolucaoPrevista = document.querySelector('#createTrocaForm input[name="devolucaoPrevista"]').value;
+                const customerId = Number(document.getElementById('trocaCustomerId').dataset.id)
+
+                const order = {
+                    customerId,
+                    entregaPrevista,
+                    devolucaoPrevista,
+                    orderItems: []
+                };
+
+                const itemsContainer = document.getElementById('trocaItemsContainer');
+                itemsContainer.querySelectorAll('div').forEach(div => {
+                    const item = {
+                        productId: Number(div.querySelector('select[name="productId"]').value),
+                        quantity: Number(div.querySelector('input[name="quantity"]').value),
+                        unitPrice: 0,
+                        custoDiario: parseFloat(div.querySelector('input[name="unitPrice"]').value).toFixed(2),//unitPrice
+                        diasLocados: Number(div.querySelector('input[name="diasLocados"]').value),
+                        endereco: {
+                            street: div.querySelector('input[name="street"]').value,
+                            number: div.querySelector('input[name="number"]').value,
+                            city: div.querySelector('input[name="city"]').value,
+                            state: div.querySelector('input[name="state"]').value,
+                            zipCode: div.querySelector('input[name="zipCode"]').value
+                        }
+                    };
+                    order.orderItems.push(item);
+                });
+
+                const response = await fetch(`${window.apiUrl}/api/orders/ov1/troca/${window.idTrocaOrdem}`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(order)
+                });
+
+                if (response.ok) {
+                    alert("Troca registrada com sucesso!");
+                    document.getElementById('createTrocaModal').classList.add('hidden');
+                    await loadSalesData();
+                } else {
+                    const error = await response.json();
+                    alert("Erro ao registrar troca: " + (error.message || "verifique os campos."));
+                }
+            };
+
+            document.getElementById('createTrocaModal').classList.remove('hidden');
+        };
+
+        document.getElementById('createTrocaCloseBtn').onclick = () => {
+            document.getElementById('createTrocaModal').classList.add('hidden');
+        };
+    }
+
+    function initBotaoEditarOrdem() {
+        document.getElementById('editModalCloseBtn').onclick = () => {
+            document.getElementById('editOrderModal').classList.add('hidden');
+        };
+        document.getElementById('saveEditBtn').addEventListener('click', async function (e) {
+            e.preventDefault();
+
+            const orderId = document.getElementById('editOrderId').value;
+
+            const payload = {
+                status: document.getElementById('editStatus').value,
+                entregaFactual: document.getElementById('editEntregaFactual').value || null,
+                devolucaoReal: document.getElementById('editDevolucaoReal').value || null,
+                totalPaid: null,
+                totalAmount: null,
+                descricao: document.getElementById('editDescricao').value || null,
+                itens: []
+            };
+
+            try {
+                const response = await fetch(`${window.apiUrl}/api/orders/ov1/${orderId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload),
+                    credentials: 'include'
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Order updated!');
+                    document.getElementById('editOrderModal').classList.add('hidden');
+                    await loadSalesData();
+                } else {
+                    console.error(result.message);
+                    alert('Erro: ' + result.message);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Unexpected error');
+            }
+        });
+    }
+
+    async function initBotaoCriarOrdem() {
+
+        await fetchClients();
+
+        document.querySelector('.new-order-btn').onclick = () => {
+            document.getElementById('createOrderModal').classList.remove('hidden');
+            loadClientsData();
+        };
+
+        document.getElementById('createOrderCloseBtn').onclick = () => {
+            document.getElementById('createOrderModal').classList.add('hidden');
+        };
+
+        document.getElementById('addItemBtn').onclick = () => {
+            const container = document.getElementById('itemsContainer');
+            const div = document.createElement('div');
+            div.className = "grid grid-cols-3 gap-2 border p-2 rounded bg-gray-100";
+
+            div.innerHTML = `
+                                <select name="productId" class="border px-2 py-1 rounded" required></select>
+                                <input type="number" name="quantity" placeholder="Quantidade" class="border px-2 py-1 rounded" required />
+                                <input type="number" name="unitPrice" placeholder="Preço Unitário" step="0.01" class="border px-2 py-1 rounded" required readonly />
+                                <input type="number" name="diasLocados" placeholder="Dias" class="border px-2 py-1 rounded" required />
+                                <input type="text" name="street" placeholder="Rua" class="border px-2 py-1 rounded" required />
+                                <input type="text" name="number" placeholder="Número" class="border px-2 py-1 rounded" required />
+                                <input type="text" name="city" placeholder="Cidade" class="border px-2 py-1 rounded" required />
+                                <input type="text" name="state" placeholder="Estado" class="border px-2 py-1 rounded" required />
+                                <input type="text" name="zipCode" placeholder="CEP" class="border px-2 py-1 rounded" required />
+                            `;
+            // <input type="number" name="custoDiario" placeholder="Custo Diário" step="0.01"
+            //        className="border px-2 py-1 rounded" required/>
+
+            container.appendChild(div);
+
+            // Carrega produtos no select
+            const productSelect = div.querySelector('select[name="productId"]');
+            if (productSelect) {  // Verifica se o select foi encontrado
+                loadProductsData(productSelect);
+
+                // Preenche o preço automaticamente ao selecionar o produto
+                productSelect.addEventListener('change', async (e) => {
+                    const selectedProductId = e.target.value;
+                    if (selectedProductId) {
+                        try {
+                            const response = await fetch(`${window.apiUrl}/api/products/${selectedProductId}`, {
+                                credentials: 'include'
+                            });
+
+                            if (!response.ok) throw new Error('Erro ao carregar produto');
+
+                            const produto = await response.json();
+                            const unitPriceInput = div.querySelector('input[name="unitPrice"]');
+                            unitPriceInput.value = produto.price.toFixed(2); // Preenche o preço automaticamente
+                        } catch (err) {
+                            alert("Erro ao carregar produto: " + err.message);
+                        }
+                    }
+                });
+            } else {
+                console.error('Não foi possível encontrar o select de produtos');
+            }
+        };
+
+        document.getElementById('createOrderForm').onsubmit = async (e) => {
+            e.preventDefault();
+
+            const form = e.target;
+            const formData = new FormData(form);
+
+            const order = {
+                // status: formData.get("status").toUpperCase(),
+                customerId: Number(formData.get("customerId")),
+                // orderDate: formData.get("orderDate"),
+                // totalAmount: parseFloat(formData.get("totalAmount")).toFixed(2),
+                entregaPrevista: formData.get("entregaPrevista"),
+                devolucaoPrevista: formData.get("devolucaoPrevista"),
+                orderItems: []
+            };
+
+            const itemsContainer = document.getElementById('itemsContainer');
+            itemsContainer.querySelectorAll('div').forEach(div => {
+                const inputs = div.querySelectorAll('input');
+                const item = {
+                    productId: Number(inputs[0].value),
+                    quantity: Number(inputs[1].value),
+                    unitPrice: parseFloat(inputs[2].value).toFixed(2),
+                    custoDiario: parseFloat(inputs[3].value).toFixed(2),
+                    diasLocados: Number(inputs[4].value),
+                    endereco: {
+                        street: inputs[5].value,
+                        number: inputs[6].value,
+                        city: inputs[7].value,
+                        state: inputs[8].value,
+                        zipCode: inputs[9].value
+                    }
+                };
+                order.orderItems.push(item);
+            });
+
+            const response = await fetch(`${window.apiUrl}/api/orders/ov1`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(order)
+            });
+
+            if (response.ok) {
+                alert("Ordem criada com sucesso!");
+                document.getElementById('createOrderModal').classList.add('hidden');
+                // form.reset();
+                // document.getElementById('itemsContainer').innerHTML = '';
+                await loadSalesData();
+            } else {
+                const error = await response.json();
+                alert("Erro ao criar ordem: " + (error.message || "verifique os campos."));
+            }
+        };
+    }
+
+    async function fetchClients(){
+        await loadClientsData();
+
+        const select = document.getElementById('customerId');
+        while (select.children.length > 1) {
+            select.removeChild(select.lastChild);
+        }
+
+        window.clientes.forEach(c => {
+            const option = document.createElement('option');
+            option.value = c.id;
+            option.textContent = `${c.name} – ${c.email} – ${c.phone}`;
+            select.appendChild(option);
+        });
+    }
+
+</script>
