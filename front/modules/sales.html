@@ -1419,17 +1419,17 @@
             itemsContainer.querySelectorAll('div').forEach(div => {
                 const inputs = div.querySelectorAll('input');
                 const item = {
-                    productId: Number(inputs[0].value),
-                    quantity: Number(inputs[1].value),
-                    unitPrice: parseFloat(inputs[2].value).toFixed(2),
-                    custoDiario: parseFloat(inputs[3].value).toFixed(2),
-                    diasLocados: Number(inputs[4].value),
+                    productId: Number(1),
+                    quantity: Number(inputs[0].value),
+                    unitPrice: parseFloat(inputs[1].value).toFixed(2),
+                    custoDiario: '1',
+                    diasLocados: Number(inputs[2].value),
                     endereco: {
-                        street: inputs[5].value,
-                        number: inputs[6].value,
-                        city: inputs[7].value,
-                        state: inputs[8].value,
-                        zipCode: inputs[9].value
+                        street: inputs[3].value,
+                        number: inputs[4].value,
+                        city: inputs[5].value,
+                        state: inputs[6].value,
+                        zipCode: inputs[7].value
                     }
                 };
                 order.orderItems.push(item);
